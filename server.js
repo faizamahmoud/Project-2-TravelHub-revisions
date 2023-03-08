@@ -2,39 +2,24 @@ require('dotenv').config(); // Load environment variables
 
 const express = require('express'); // Import the express library
 const app = express(); // Create an express application
-const session = require("express-session"); // Import the express-session library
+const expressLayouts = require('express-ejs-layouts');
+
 const MongoStore = require("connect-mongo"); // Import the connect-mongo library
 const methodOverride = require('method-override'); // Import the method-override library
 const PORT = process.env.PORT || 4000; // Set the port to the value of process.env.PORT or 4000 if it is not defined
-
+// express json and urlencoded
 // Import the controllers
-const commentController = require('./controller/comments_controllers.js');
-const authController = require('./controller/auth_controllers.js');
-const travelHubController = require("./controller/travelHub_controllers");
+// const commentController = require('./src/controller/comments_controllers.js');
+// const authController = require('./src/controller/auth_controllers.js');
+
+
+const {Auth, Comments, Posts} = require("./src/routes")
 
 // Set the view engine to EJS
 app.set('view engine', 'ejs');
+app.set('layout', './layout/standard-layout')
+app.use(expressLayouts);
 
-/* 
-SECTION: App Config 
-*/
-
-// Configure the session store
-app.use(
-  session({
-    store: MongoStore.create({ mongoUrl: process.env.MONGODB_URI }), // Store the sessions in MongoDB
-    secret: "super secret", // Secret key used to sign the cookie
-    resave: false,
-    saveUninitialized: false,
-    cookie: {
-      maxAge: 1000 * 60 * 60 * 24 * 7 * 2, // Two weeks
-    },
-  })
-);
-
-/* 
-SECTION: Middleware 
-*/
 
 // Middleware to set `res.locals.user` to `req.session.currentUser`
 app.use(function (req, res, next) {
@@ -61,13 +46,15 @@ app.use(express.static('public'));
 app.use('/travelhub', authRequired, travelHubController);
 app.use('/comment', commentController);
 app.use("/", authController);
+// Routes
 
-// 404 Wildcard Route
+
 app.get('/*', (req, res) => {
   res.render('404');
 });
 
-// Start the Express application
 app.listen(PORT, () => {
   console.log(`Running on PORT: ${PORT}`);
 });
+
+

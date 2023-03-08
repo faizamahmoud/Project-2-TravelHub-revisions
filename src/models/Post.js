@@ -2,7 +2,6 @@ const mongoose = require('mongoose');
 
 const PostSchema = new mongoose.Schema({
     title: String,
-    subject: {type: String, default: null},
     body: String,
     comment: [{type: mongoose.Types.ObjectId,ref: "Comment"}],
     date: {type: Date, default:Date.now},
